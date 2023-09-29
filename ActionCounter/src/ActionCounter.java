@@ -8,7 +8,27 @@
  * */
 import java.util.Stack;
 
-public class Main {
+public class ActionCounter {
+
+    private final Stack<Integer> hits;
+    private static final int TIMESTAMP_INTERVAL_SEC = 300;
+
+    public ActionCounter() {
+        hits = new Stack<>();
+    }
+
+    public void call(int timestamp) {
+        hits.push(timestamp);
+    }
+
+    public int getActions(int timestamp) {
+        return (int) hits.stream()
+                .filter(hit -> (hit > timestamp - TIMESTAMP_INTERVAL_SEC) && (hit <= timestamp)) //фильтруем по времени обращения (за последние 5 минут), т.е. при указании timestamp(301), посчитаются обращения за время от 2 до 301 секунд включительно
+                .count();
+    }
+}
+
+class Main {
     public static void main(String[] args) {
         ActionCounter actionCounter = new ActionCounter();
         actionCounter.call(1);
@@ -27,25 +47,5 @@ public class Main {
         actionCounter.call(19801);
         System.out.println(actionCounter.getActions(19500));
         System.out.println(actionCounter.getActions(19800));
-    }
-}
-
-class ActionCounter {
-
-    private final Stack<Integer> hits;
-    private static final int TIMESTAMP_INTERVAL_SEC = 300;
-
-    public ActionCounter() {
-        hits = new Stack<>();
-    }
-
-    public void call(int timestamp) {
-        hits.push(timestamp);
-    }
-
-    public int getActions(int timestamp) {
-        return (int) hits.stream()
-                .filter(hit -> (hit > timestamp - TIMESTAMP_INTERVAL_SEC) && (hit <= timestamp)) //фильтруем по времени обращения (за последние 5 минут), т.е. при указании timestamp(301), посчитаются обращения за время от 2 до 301 секунд включительно
-                .count();
     }
 }
